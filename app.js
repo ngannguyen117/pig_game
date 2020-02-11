@@ -9,29 +9,36 @@ GAME RULES:
 
 */
 
-var scores, roundScore, activePlayer, diceDOM, gamePlaying;
+var scores, roundScore, activePlayer, diceDOM, gamePlaying, prevDice;
 
 diceDOM = document.querySelector('.dice');
 
 init();
-
 
 document.querySelector('.btn-roll').addEventListener('click', function () {
   if (gamePlaying) {
     // 1. Random number
     var dice = Math.floor(Math.random() * 6 + 1);
 
-    // 2. Display the result
-    diceDOM.style.display = 'block';
-    diceDOM.src = 'dice-' + dice + '.png';
-
-    // 3. Update the round score IF the rolled number was not a 1
-    if (dice !== 1) {
-      // Add score
-      roundScore += dice;
-      document.querySelector('#current-' + activePlayer).textContent = roundScore;
-    } else {
+    // 1.a Check if the player rolls two 6 in a row
+    if (dice === 6 && prevDice === 6){
+      scores[activePlayer] = 0;
       switchPlayer();
+    } else {
+      prevDice = dice;
+
+      // 2. Display the result
+      diceDOM.style.display = 'block';
+      diceDOM.src = 'dice-' + dice + '.png';
+
+      // 3. Update the round score IF the rolled number was not a 1
+      if (dice !== 1) {
+        // Add score
+        roundScore += dice;
+        document.querySelector('#current-' + activePlayer).textContent = roundScore;
+      } else {
+        switchPlayer();
+      }
     }
   }
 });
@@ -63,6 +70,7 @@ function init() {
   scores = [0, 0];
   roundScore = 0;
   activePlayer = 0;
+  prevDice = 0;
   gamePlaying = true;
 
   diceDOM.style.display = 'none';
@@ -82,6 +90,7 @@ function init() {
 function switchPlayer() {
   // Reset dice and round score
   roundScore = 0;
+  prevDice = 0;
   document.getElementById('current-' + activePlayer).textContent = 0;
   diceDOM.style.display = 'none';
   document.querySelector('.player-' +  activePlayer + '-panel').classList.remove('active');
